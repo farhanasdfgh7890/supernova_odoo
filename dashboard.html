@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Projects View</title>
+<style>
+* { box-sizing: border-box; margin:0; padding:0; font-family:'Segoe UI', Tahoma, sans-serif; }
+body {
+    background: url('https://i.pinimg.com/1200x/b6/b8/31/b6b8315013361056dd4e3ef5a3305755.jpg') no-repeat center center fixed;
+    background-size: cover;
+    color: #333;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+}
+.card-menu {
+  position: relative;
+  cursor: pointer;
+}
+
+.card-menu-options {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 20px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+  color: black;
+}
+
+
+
+/* Top Bar */
+.top-bar {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background: rgba(255,255,255,0.9);
+    padding:0.5rem 1rem;
+    box-shadow:0 2px 6px rgba(0,0,0,0.1);
+    position: sticky;
+    top:0;
+    z-index:10;
+}
+.logo-search {
+    display:flex;
+    align-items:center;
+    gap:1rem;
+}
+.logo { font-size:1.5rem; font-weight:bold; color:#6a0dad; cursor:pointer; }
+.search-container input { padding:0.4rem 0.6rem; border-radius:4px; border:1px solid #ccc; width:150px; }
+.actions { display:flex; align-items:center; gap:0.7rem; position:relative; }
+.action-box { background:#6a0dad; color:white; padding:0.4rem 0.6rem; border-radius:4px; cursor:pointer; font-size:0.9rem; text-align:center; transition:0.2s; }
+.action-box:hover { background:#570aa0; }
+.icons span { font-size:1.2rem; cursor:pointer; margin-left:0.5rem; position:relative; }
+.dropdown { display:none; position:absolute; top:25px; right:0; background:white; border:1px solid #ccc; border-radius:4px; box-shadow:0 2px 6px rgba(0,0,0,0.2); z-index:10; min-width:180px; padding:0.3rem 0; }
+.dropdown div { padding:0.6rem 0.8rem; cursor:pointer; font-size:0.85rem; display:flex; justify-content:space-between; align-items:center; font-weight:bold; border-radius:4px; transition:0.2s; }
+.dropdown div:hover { background:#f0f0f0; box-shadow:0 1px 3px rgba(0,0,0,0.1); }
+
+/* Content */
+.content { display:flex; flex:1; padding:1rem; gap:1rem; position:relative; }
+
+/* Sidebar */
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 60px;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.5); /* ✅ semi-transparent white */
+  backdrop-filter: blur(8px); /* ✅ glass-morphism */
+  transition: width 0.3s;
+  flex-shrink: 0;
+  position: relative;
+}
+.sidebar.expanded { width:200px; }
+
+.sidebar::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 1px;
+    height: 100%;
+    background: rgba(0,0,0,0.2);
+}
+
+/* Mobile view - horizontal line below logo */
+@media(max-width:768px){
+    .sidebar::after {
+        width: 100%;
+        height: 1px;
+        bottom: 0;
+        right: 0;
+        top: auto;
+    }
+}
+
+.sidebar .logo-sn { font-size:1.3rem; font-weight:bold; color:#6a0dad; cursor:pointer; text-align:center; margin-bottom:1rem; }
+
+.sidebar .buttons {
+    display:none;
+    flex-direction:column;
+    gap:1rem;
+    margin-top: 0; /* ✅ aligned with project cards */
+    padding-top: 1rem;
+}
+.sidebar.expanded .buttons { display:flex; }
+.sidebar .buttons button {
+    padding:0.6rem 1rem;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+    background:#6a0dad;
+    color:white;
+    transition:0.3s;
+    text-align:left;
+    font-weight:bold;
+}
+.sidebar .buttons button:hover { background:#570aa0; }
+
+/* Bottom Profile Section */
+.sidebar-user {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  position: relative;
+}
+
+.user-avatar {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: 1;
+}
+
+.user-email {
+  font-size: 0.85rem;
+  color: #333;
+  display: none;
+}
+
+.sidebar.expanded .user-email {
+  display: block;
+}
+
+.user-menu-btn {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #333;
+}
+
+.user-options {
+  display: none;
+  position: absolute;
+  bottom: 45px;
+  left: 0;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  z-index: 5;
+  width: 160px;
+}
+
+.user-options div {
+  padding: 0.4rem 0.8rem;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.user-options div:hover {
+  background: #eee;
+}
+
+/* Projects Area */
+.project-area {
+    flex:1;
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px,1fr));
+    gap:1.2rem;
+    align-items:start;
+}
+.project-card {
+    background: rgba(255,255,255,0.95);
+    padding:1rem;
+    border-radius:12px;
+    box-shadow:0 4px 15px rgba(0,0,0,0.15);
+    cursor:pointer;
+    display:flex;
+    flex-direction:column;
+    justify-content: space-between;
+    transition:0.3s;
+}
+.project-card:hover {
+    transform:translateY(-7px);
+    box-shadow:0 12px 25px rgba(0,0,0,0.25);
+}
+.project-card .card-top { display:flex; justify-content:space-between; align-items:center; }
+.project-card .card-menu { cursor:pointer; position:relative; padding:0 3px; border-radius:4px; transition:0.2s; }
+.project-card .card-menu:hover { background:#570aa0; color:white; }
+.project-card .card-menu-options { display:none; position:absolute; top:25px; right:0; background:white; border:1px solid #ccc; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,0.1); z-index:5; min-width:90px; }
+.project-card .card-menu-options div { padding:0.5rem 0.8rem; cursor:pointer; transition:0.2s; font-size:0.9rem; }
+.project-card .card-menu-options div:hover { background:#eee; }
+.project-card .project-name { font-weight:bold; margin-top:10px; font-size:1rem; color:#333; }
+.project-card .card-bottom { display:flex; justify-content:space-between; align-items:center; font-size:0.85rem; margin-top:10px; }
+.project-card .deadline { font-size:0.75rem; color:#777; }
+.project-card .manager-img { width:30px; height:30px; border-radius:50%; margin-top:2px; }
+.project-card .tags { background:#6a0dad; color:white; font-size:0.75rem; padding:3px 8px; border-radius:6px; font-weight:bold; }
+
+/* Modal */
+.modal-backdrop { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); display:none; justify-content:center; align-items:center; z-index:50; }
+.modal { background:white; padding:1.5rem 2rem; border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,0.25); max-width:350px; width:100%; text-align:center; }
+.modal input { width:90%; padding:0.5rem; border-radius:6px; border:1px solid #ccc; margin-top:0.5rem; }
+
+@media(max-width:768px){
+    .content{ flex-direction:column; }
+    .sidebar{ width:60px; flex-direction:row; justify-content:flex-start; }
+    .sidebar.expanded{ width:200px; flex-direction:column; }
+    .project-area{ grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); }
+}
+</style>
+</head>
+<body>
+
+<!-- Top Bar -->
+<div class="top-bar">
+    <div class="logo-search">
+        <div class="logo" onclick="toggleSidebar()">☰</div>
+        <div class="search-container">
+            <input type="text" placeholder="Search projects..." />
+        </div>
+    </div>
+    <div class="actions">
+        <a href="create-project.html" class="action-box" style="text-decoration:none;">+ New Project</a>
+        <div class="icons">
+            <span title="Notifications" onclick="toggleNotifications(this)">🔔
+                <div class="dropdown" id="notificationDropdown">
+                    <div class="bold-notification">Project 1 deadline approaching <button title="Mark as read" onclick="markRead(this)">✔</button></div>
+                    <div class="bold-notification">Project 2 task added <button title="Mark as read" onclick="markRead(this)">✔</button></div>
+                </div>
+            </span>
+            <span title="Settings" onclick="toggleSettings(this)">⚙
+                <div class="dropdown" id="settingsDropdown">
+                    <div>Global Settings</div>
+                    <div>Application Settings</div>
+                </div>
+            </span>
+        </div>
+    </div>
+</div>
+
+<div class="content">
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+  <div class="logo-sn" onclick="toggleSidebar()">Sn</div>
+  <div class="buttons">
+    <button>Projects</button>
+    <button>My Tasks</button>
+  </div>
+
+  <!-- Bottom Profile Section -->
+  <div class="sidebar-user">
+    <img src="https://i.pravatar.cc/40" alt="User" class="user-avatar">
+    <div class="user-info">
+      <div class="user-email">user@example.com</div>
+      <button class="user-menu-btn" onclick="toggleUserOptions(event)">⋯</button>
+    </div>
+    <div class="user-options">
+      <div onclick="openProfileSettings()">Profile Settings</div>
+      <div onclick="openUserSettings()">User Settings</div>
+    </div>
+  </div>
+</div>
+
+    <!-- Projects Area -->
+    <div class="project-area" id="projectArea">
+        <div class="project-card">
+            <div class="card-top">
+                <div class="tags">Tag1</div>
+                <div class="card-menu" onclick="toggleCardMenu(this)">...
+                    <div class="card-menu-options">
+                        <div onclick="editProject(this)">Edit</div>
+                        <div onclick="deleteProject(this)">Delete</div>
+                    </div>
+                </div>
+            </div>
+            <div class="project-name">Project 1</div>
+            <div class="card-bottom">
+                <div>
+                    <div class="deadline">Deadline: 10 Sep</div>
+                    <img src="https://i.pravatar.cc/25" class="manager-img"/>
+                </div>
+                <div>🗂 5</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for New Project -->
+<div class="modal-backdrop" id="modalBackdrop">
+    <div class="modal">
+        <h3>Create New Project</h3>
+        <input type="text" id="newProjectName" placeholder="Project Name">
+        <div style="margin-top:1rem;">
+            <button onclick="addNewProject()">Create</button>
+            <button onclick="closeModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleSidebar(){
+    const sb=document.getElementById('sidebar');
+    sb.classList.toggle('expanded');
+}
+
+function toggleUserOptions(event){
+  event.stopPropagation();
+  const menu = document.querySelector('.user-options');
+  menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+}
+document.addEventListener('click', function(event){
+  const menu = document.querySelector('.user-options');
+  if (menu && !event.target.closest('.sidebar-user')) {
+    menu.style.display = 'none';
+  }
+});
+
+function openProfileSettings(){ alert("Opening Profile Settings..."); }
+function openUserSettings(){ alert("Opening User Settings..."); }
+
+function toggleCardMenu(card){
+    card.querySelector('.card-menu-options').style.display = card.querySelector('.card-menu-options').style.display==='block'?'none':'block';
+}
+
+function deleteProject(elem){
+    if(confirm("Are you sure you want to delete this project?")) elem.closest('.project-card').remove();
+}
+
+function editProject(elem){
+    const card = elem.closest('.project-card');
+    const pn = card.querySelector('.project-name');
+    const n=prompt("Enter new project name:",pn.textContent);
+    if(n && n.trim()!=='') pn.textContent=n;
+}
+
+function openNewProjectModal(){
+    document.getElementById('modalBackdrop').style.display='flex';
+    document.getElementById('newProjectName').value='';
+}
+
+function closeModal(){ document.getElementById('modalBackdrop').style.display='none'; }
+
+function addNewProject(){
+    const name = document.getElementById('newProjectName').value.trim();
+    if(!name) return alert("Project name required!");
+    const card = document.createElement('div');
+    card.className='project-card';
+    card.innerHTML=`
+        <div class="card-top">
+            <div class="tags">New</div>
+            <div class="card-menu" onclick="toggleCardMenu(this)">...
+                <div class="card-menu-options">
+                    <div onclick="editProject(this)">Edit</div>
+                    <div onclick="deleteProject(this)">Delete</div>
+                </div>
+            </div>
+        </div>
+        <div class="project-name">${name}</div>
+        <div class="card-bottom">
+            <div>
+                <div class="deadline">No deadline</div>
+                <img src="https://i.pravatar.cc/25" class="manager-img"/>
+            </div>
+            <div>🗂 0</div>
+        </div>
+    `;
+    document.getElementById('projectArea').appendChild(card);
+    closeModal();
+}
+
+function toggleNotifications(el){
+    const dd = document.getElementById('notificationDropdown');
+    dd.style.display = dd.style.display === 'block' ? 'none' : 'block';
+}
+function markRead(btn){
+    const p = btn.parentElement;
+    p.style.fontWeight = 'normal';
+    btn.remove();
+    event.stopPropagation();
+}
+document.addEventListener('click', function(event){
+    const notif = document.getElementById('notificationDropdown');
+    const settings = document.getElementById('settingsDropdown');
+    if(!event.target.closest('[title="Notifications"]')){
+        notif.style.display = 'none';
+    }
+    if(!event.target.closest('[title="Settings"]')){
+        settings.style.display = 'none';
+    }
+});
+function toggleSettings(el){ 
+    const dd=document.getElementById('settingsDropdown'); 
+    dd.style.display=dd.style.display==='block'?'none':'block'; 
+}
+</script>
+<script type="module">
+    import { db } from "./src/firebase.js";
+    
+  import { auth } from "./src/firebase.js";
+  import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  // check login
+  onAuthStateChanged(auth, (user) => {
+    if (!user) {
+      alert("⚠️ You must log in first!");
+      window.location.href = "Login.html";
+    } else {
+      document.querySelector(".user-email").textContent = user.email;
+    }
+  });
+
+  // add logout option
+  const logoutBtn = document.createElement("div");
+  logoutBtn.textContent = "Logout";
+  logoutBtn.style.cursor = "pointer";
+  logoutBtn.style.padding = "0.4rem 0.8rem";
+  logoutBtn.style.color = "red";
+
+  logoutBtn.onclick = async () => {
+    await signOut(auth);
+    alert("👋 Logged out successfully!");
+    window.location.href = "Login.html";
+  };
+
+  const userOptions = document.querySelector(".user-options");
+  if (userOptions) {
+    userOptions.appendChild(logoutBtn);
+  }
+  let currentProject = "";
+let currentProjectId = "";
+
+window.addTask = async function() {
+  const taskInput = document.getElementById("newTaskInput");
+  const task = taskInput.value.trim();
+  if (!task) return alert("Enter a task!");
+  
+  await addDoc(collection(db, "projects", currentProjectId, "tasks"), {
+    name: task,
+    createdAt: new Date()
+  });
+  taskInput.value = "";
+  loadTasks(currentProjectId);
+};
+
+window.loadTasks = async function(projectId) {
+  const taskList = document.getElementById("taskList");
+  taskList.innerHTML = "";
+  const snapshot = await getDocs(collection(db, "projects", projectId, "tasks"));
+  snapshot.forEach(docSnap => {
+    const li = document.createElement("li");
+    li.textContent = docSnap.data().name;
+    li.style.padding = "5px 0";
+    taskList.appendChild(li);
+  });
+};
+
+window.closeTaskModal = function() {
+  document.getElementById("taskModalBackdrop").style.display = "none";
+};
+document.addEventListener("click", async function(e) {
+  const card = e.target.closest(".project-card");
+  if (card && !e.target.closest(".card-menu")) {
+    currentProject = card.querySelector(".project-name").textContent;
+    currentProjectId = currentProject.replace(/\s+/g, "_"); // simple project ID
+    document.getElementById("taskProjectTitle").textContent = currentProject + " - Tasks";
+    await loadTasks(currentProjectId);
+    document.getElementById("taskModalBackdrop").style.display = "flex";
+  }
+});
+
+</script>
+
+
+<div class="modal-backdrop" id="taskModalBackdrop" style="display:none;">
+  <div class="modal">
+    <h3 id="taskProjectTitle">Project Tasks</h3>
+    <input type="text" id="newTaskInput" placeholder="New Task" />
+    <button onclick="addTask()">Add Task</button>
+    <ul id="taskList" style="list-style:none; padding:0; margin-top:10px;"></ul>
+    <div style="margin-top:1rem;">
+      <button onclick="closeTaskModal()">Close</button>
+    </div>
+  </div>
+</div>
+<script>
+const searchInput = document.querySelector(".search-container input");
+searchInput.addEventListener("input", () => {
+  const query = searchInput.value.toLowerCase();
+  const projectCards = document.querySelectorAll(".project-card");
+  
+  projectCards.forEach(card => {
+    const projectName = card.querySelector(".project-name").textContent.toLowerCase();
+    if (projectName.includes(query)) {
+      card.style.display = "flex"; 
+    } else {
+      card.style.display = "none"; 
+    }
+  });
+});
+function addNewProject(){
+    const name = document.getElementById('newProjectName').value.trim();
+    if(!name) return alert("Project name required!");
+
+    const newProject = {
+        name: name,
+        tags: "New",        // default tag
+        deadline: "N/A"     // default deadline
+    };
+
+    // 1️⃣ Save to localStorage
+    const savedProjects = JSON.parse(localStorage.getItem("projects")) || [];
+    savedProjects.push(newProject);
+    localStorage.setItem("projects", JSON.stringify(savedProjects));
+
+    // 2️⃣ Add to DOM
+    addProjectCard(newProject);
+
+    closeModal();
+}
+// Load saved projects from localStorage on page load
+window.addEventListener("DOMContentLoaded", () => {
+    const savedProjects = JSON.parse(localStorage.getItem("projects")) || [];
+    savedProjects.forEach(project => addProjectCard(project));
+});
+
+// Function to add a project card to the DOM
+function addProjectCard(project) {
+    const card = document.createElement('div');
+    card.className = 'project-card';
+    card.innerHTML = `
+        <div class="card-top">
+            <div class="tags">${project.tags}</div>
+            <div class="card-menu" onclick="toggleCardMenu(this)">...
+                <div class="card-menu-options">
+                    <div onclick="editProject(this)">Edit</div>
+                    <div onclick="deleteProject(this)">Delete</div>
+                </div>
+            </div>
+        </div>
+        <div class="project-name">${project.name}</div>
+        <div class="card-bottom">
+            <div>
+                <div class="deadline">${project.deadline}</div>
+                <img src="https://i.pravatar.cc/25" class="manager-img"/>
+            </div>
+            <div>🗂 0</div>
+        </div>
+    `;
+    document.getElementById('projectArea').appendChild(card);
+}
+
+</script>
+
+
+</body>
+</html>

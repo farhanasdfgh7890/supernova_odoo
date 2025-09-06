@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create New Project</title>
+<style>
+  /* --- Copied from your original page for consistency --- */
+  * { box-sizing:border-box; margin:0; padding:0; font-family:'Segoe UI', Tahoma, sans-serif; }
+  body { min-height:100vh; background:url('https://i.pinimg.com/1200x/b6/b8/31/b6b8315013361056dd4e3ef5a3305755.jpg') no-repeat center center fixed; background-size:cover; color:#333; display:flex; flex-direction:column; }
+  .overlay { position:absolute; top:0; left:0; width:100%; height:100%; background-color:rgba(255,255,255,0.6); z-index:-1; }
+  .top-bar { display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.9); padding:0.5rem 1rem; box-shadow:0 2px 6px rgba(0,0,0,0.1); position:sticky; top:0; z-index:10; }
+  .logo-search { display:flex; align-items:center; gap:1rem; }
+  .collapse-btn { cursor:pointer; font-size:1.2rem; }
+  .logo { font-size:1.5rem; font-weight:bold; color:#6a0dad; cursor:pointer; }
+  /* Search input in top bar */
+  .search-container input { padding:0.4rem 0.6rem; border-radius:4px; border:1px solid #ccc; width:180px; background-color:rgba(255,255,255,0.7); }
+  .actions { display:flex; align-items:center; gap:0.7rem; }
+  .icons span { font-size:1.2rem; cursor:pointer; margin-left:0.5rem; }
+  .action-box { background:#6a0dad; color:white; padding:0.4rem 0.6rem; border-radius:4px; cursor:pointer; font-size:0.9rem; text-align:center; } /* Added this to support the "..." box if needed */
+
+
+  .sidebar { display:flex; flex-direction:column; justify-content:space-between; width:200px; padding:1rem; background:rgba(255,255,255,0.85); flex-shrink:0; position:fixed; top:50px; bottom:0; left:0; }
+  .sidebar .buttons { display:flex; flex-direction:column; gap:1rem; margin-top:1rem; }
+  .sidebar .buttons button { padding:0.5rem; border:none; border-radius:4px; cursor:pointer; background:#6a0dad; color:white; width:100%; margin-bottom:1rem; text-align:left; }
+  .sidebar .buttons button:hover { background-color: #520a86; }
+  .sidebar .user-email { font-size:0.9rem; color:#555; display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; }
+  .sidebar .user-email .settings-btn { cursor:pointer; background:#6a0dad; color:white; padding:0.2rem 0.4rem; border-radius:4px; }
+  .sidebar .user-email .settings-btn:hover { background-color: #520a86; }
+
+  /* --- New Styles for the Form Page --- */
+  .main-content { margin-left:200px; padding:1rem; flex:1; } /* Adjusted margin-left to match sidebar */
+
+  .form-container {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    max-width: 800px; /* Control the form width */
+    margin: 20px auto; /* Center the form in the main content area */
+  }
+
+  .form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .breadcrumbs {
+    font-size: 1.1rem; /* Slightly smaller for consistency */
+    color: #555;
+    font-weight: normal; /* Less bold for breadcrumbs */
+  }
+  .breadcrumbs .current-page {
+    font-weight: 600;
+    color: #333;
+  }
+
+  .form-actions button {
+    padding: 0.6rem 1.2rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-left: 0.5rem;
+    transition: background-color 0.2s;
+  }
+
+  .discard-btn {
+    background-color: #f0f0f0;
+    color: #333;
+    border: 1px solid #ccc;
+  }
+  .discard-btn:hover {
+    background-color: #e0e0e0;
+  }
+
+  .save-btn {
+    background-color: #6a0dad; /* Matching purple theme */
+    color: white;
+  }
+  .save-btn:hover {
+    background-color: #520a86;
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #555;
+  }
+
+  .form-group input[type="text"],
+  .form-group input[type="date"],
+  .form-group input[type="email"], /* For project manager email */
+  .form-group textarea,
+  .form-group select { /* For multi-select dropdown if we use <select> */
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+    background-color: rgba(255, 255, 255, 0.7);
+  }
+  
+  .form-group input:focus,
+  .form-group textarea:focus,
+  .form-group select:focus {
+    outline: none;
+    border-color: #6a0dad;
+    box-shadow: 0 0 0 2px rgba(106, 13, 173, 0.2);
+  }
+
+  /* Style for file input button (upload image) */
+  .file-upload-wrapper {
+    position: relative;
+    overflow: hidden;
+    display: inline-block;
+    cursor: pointer;
+    background-color: #f0f0f0;
+    color: #333;
+    padding: 0.6rem 1.2rem;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+  }
+  .file-upload-wrapper:hover {
+    background-color: #e0e0e0;
+  }
+  .file-upload-wrapper input[type="file"] {
+    font-size: 100px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+
+  .radio-group {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-top: 0.5rem;
+  }
+  .radio-group label {
+    font-weight: normal;
+    display: flex; /* Align radio button and text */
+    align-items: center;
+    cursor: pointer;
+  }
+  .radio-group input[type="radio"] {
+    margin-right: 0.5rem;
+    accent-color: #6a0dad; /* Style the radio button itself */
+    cursor: pointer;
+  }
+
+  /* Responsive Adjustments */
+  @media(max-width:768px){
+    body { flex-direction: column; }
+    .sidebar { position:relative; top:auto; width:100%; flex-direction:row; justify-content:space-between; height:auto; }
+    .sidebar .buttons { flex-direction:row; margin-top:0; }
+    .sidebar .buttons button { width:auto; flex:1; margin-right:0.5rem; text-align:center; }
+    .sidebar .user-email { margin-left: auto; } /* Push to the right */
+    .main-content { margin-left:0; padding:10px; margin-top:0; }
+    .form-container { margin: 10px; padding: 1rem; }
+    .form-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+    .form-actions { width: 100%; display: flex; justify-content: flex-end; }
+  }
+</style>
+</head>
+<body>
+<div class="overlay"></div>
+
+<div class="top-bar">
+  <div class="logo-search">
+    <div class="collapse-btn">☰</div>
+    <div class="logo">Supernova</div>
+    <div class="search-container">
+      <input type="text" placeholder="Search..." />
+    </div>
+  </div>
+  <div class="actions">
+    <div class="action-box">...</div>
+    <span title="Notifications">🔔</span>
+    <span title="Settings">⚙</span>
+  </div>
+</div>
+
+<div class="sidebar" id="sidebar">
+  <div class="buttons">
+    <a href="dashboard.html"><button>Projects</button></a>
+    <button>My Tasks</button>
+  </div>
+  <div class="user-email">
+    Test User <br> user@email.com
+    <div class="settings-btn">...</div>
+  </div>
+</div>
+<div class="form-actions">
+  <button type="submit" class="save">Save</button>
+  <button type="button" class="discard" onclick="window.location.href='dashboard.html'">Discard</button>
+</div>
+
+
+<div class="main-content">
+  <div class="form-container">
+    <form id="projectForm">
+        <script>
+document.getElementById("projectForm").addEventListener("submit", function(e) {
+  e.preventDefault();
+
+  const project = {
+    name: document.getElementById("name").value,
+    tags: document.getElementById("tags").value,
+    manager: document.getElementById("projectManager").value,
+    deadline: document.getElementById("deadline").value,
+    priority: document.querySelector("input[name='priority']:checked")?.value,
+    description: document.getElementById("description").value
+  };
+
+  // Save to localStorage
+  let projects = JSON.parse(localStorage.getItem("projects")) || [];
+  projects.push(project);
+  localStorage.setItem("projects", JSON.stringify(projects));
+
+  // Redirect back to dashboard
+  window.location.href = "dashboard.html";
+});
+</script>
+
+
+      <div class="form-header">
+        <span class="breadcrumbs">Projects &gt; <span class="current-page">New Project</span></span>
+        <div class="form-actions">
+          <a href="dashboard.html"><button type="button" class="discard-btn">Discard</button></a>
+          <button type="submit" class="save-btn">Save</button>
+        </div>
+      </div>
+
+      <div class="form-body">
+        <div class="form-group">
+          <label for="name">Name</label>
+          <input type="text" id="name" name="name" placeholder="e.g., Q4 Marketing Campaign" required>
+        </div>
+
+        <div class="form-group">
+          <label for="tags">Tags (Multi Selection Dropdown)</label>
+          <input type="text" id="tags" name="tags" placeholder="e.g., UI/UX, Development, Marketing">
+        </div>
+        
+        <div class="form-group">
+          <label for="projectManager">Project Manager (Invite Selection Field)</label>
+          <input type="email" id="projectManager" name="projectManager" placeholder="Enter email to invite or select from list...">
+        </div>
+
+        <div class="form-group">
+          <label for="deadline">Deadline</label>
+          <input type="date" id="deadline" name="deadline">
+        </div>
+
+        <div class="form-group">
+          <label>Priority (Single Radio Selection)</label>
+          <div class="radio-group">
+            <label><input type="radio" name="priority" value="Low"> Low</label>
+            <label><input type="radio" name="priority" value="Medium" checked> Medium</label>
+            <label><input type="radio" name="priority" value="High"> High</label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="image">Image</label>
+          <div class="file-upload-wrapper">
+            Upload Image
+            <input type="file" id="image" name="image" accept="image/*">
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="description">Description</label>
+          <textarea id="description" name="description" rows="5" placeholder="Add a detailed description of the project..."></textarea>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+<script>
+document.getElementById("projectForm").addEventListener("submit", function(e) {
+  e.preventDefault();
+
+  const project = {
+    name: document.getElementById("name").value,
+    tags: document.getElementById("tags").value,
+    manager: document.getElementById("projectManager").value,
+    deadline: document.getElementById("deadline").value,
+    priority: document.querySelector("input[name='priority']:checked")?.value || "Normal",
+    description: document.getElementById("description").value
+  };
+
+  // Save to localStorage
+  let projects = JSON.parse(localStorage.getItem("projects")) || [];
+  projects.push(project);
+  localStorage.setItem("projects", JSON.stringify(projects));
+
+  // Redirect back to dashboard
+  window.location.href = "dashboard.html";
+});
+</script>
+
+
+</body>
+</html>

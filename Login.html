@@ -5,19 +5,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Project Login</title>
   <link rel="stylesheet" href="style.css">
+
+  <!-- Load Firebase & login scripts -->
+  <script type="module" src="./src/firebase.js"></script>
+  <script type="module" src="./src/login.js" defer></script>
 </head>
 <body>
+  <!-- Navbar -->
   <nav class="navbar">
-    <div class="logo">SUPERNOVA </div>
+    <div class="logo">SUPERNOVA</div>
     <ul class="nav-links">
       <li><a href="#">Home</a></li>
       <li><a href="#">Solution</a></li>
       <li><a href="#">Login</a></li>
-      <li><a href="#" class="signup">Sign Up</a></li>
+      <li><a href="accountsignup.html" class="signup">Sign Up</a></li>
     </ul>
   </nav>
+
+  <!-- Login Form -->
   <section class="login-container">
-    <h2>Login </h2>
+    <h2>Login</h2>
     <form>
       <label>Email</label>
       <input type="email" placeholder="Enter your email" required>
@@ -25,20 +32,24 @@
       <label>Password</label>
       <input type="password" placeholder="Enter your password" required>
 
-      <a href="forgot-password.html" class="forgot">Forget password?</a>
+      <a href="forgot-password.html" class="forgot">Forgot password?</a>
 
+      <!-- Button should only be button -->
+      <button type="submit" class="btn">Login</button>
 
-      <button type="submit" class="btn">Login </button>
-      <p class="signup-text">Don’t have an account? <a href="#">Sign up</a></p>
-
+      <p class="signup-text">
+        Don’t have an account? <a href="accountsignup.html">Sign up</a>
+      </p>
     </form>
   </section>
+
+  <!-- Footer -->
   <footer>
-  <div class="footer-box">
-    <img src="https://i.pinimg.com/originals/52/d9/b3/52d9b35181578642c823f63a457fe99b.gif"
-         alt="Logo GIF" class="footer-logo">
-  </div>
-<div class="footer-links">
+    <div class="footer-box">
+      <img src="https://i.pinimg.com/originals/52/d9/b3/52d9b35181578642c823f63a457fe99b.gif"
+           alt="Logo GIF" class="footer-logo">
+    </div>
+    <div class="footer-links">
       <div>
         <h4>Quick Links</h4>
         <ul>
